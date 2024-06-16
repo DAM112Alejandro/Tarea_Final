@@ -28,7 +28,7 @@ async def update_event(updateUser: Users , token = Depends(getToken)):
     return userSchema(db.users.find_one({"_id": ObjectId(user["_id"])}))
 
 @router.delete("/delete/{id}")
-async def delete_user(id):
+async def delete_user(id, token = Depends(getToken)):
     found = db.users.find_one({"_id": ObjectId(id)}) 
     if not found:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User does not exist")

@@ -21,7 +21,7 @@ async def get_events_by_id(id):
     return eventSchema(db.events.find_one({"_id": ObjectId(id)}))
 
 @router.post("/add" , response_model=Events)
-async def create_event(newEvent: Events):
+async def create_event(newEvent: Events, token = Depends(getToken)):
     if db.events.find_one({"title": newEvent.title , 'location': newEvent.location , 'star_time' : newEvent.start_time}):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT , detail="Event already exists")
     
@@ -30,7 +30,7 @@ async def create_event(newEvent: Events):
     return eventSchema(db.events.find_one({"_id": ObjectId(id)}))
 
 @router.put("/update/{id}" , response_model=Events)
-async def update_event(updateEvent: Events ,id : str):
+async def update_event(updateEvent: Events ,id : str, token = Depends(getToken)):
     update_data = {
         k: v for k, v in updateEvent.model_dump(exclude_unset=True).items()
         if v not in [None ,  ""  , "string" , 0]  
@@ -44,7 +44,7 @@ async def update_event(updateEvent: Events ,id : str):
     return eventSchema(db.events.find_one({"_id": ObjectId(id)}))
 
 @router.delete("/delete/{id}")
-async def delete_event(id):
+async def delete_event(id, token = Depends(getToken)):
     found = db.events.find_one({"_id": ObjectId(id)}) 
     if not found:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event does not exist")
